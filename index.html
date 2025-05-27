@@ -2,58 +2,57 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Event Countdown</title>
+  <title>Countdown Debug</title>
   <style>
     body { font-family: sans-serif; text-align: center; padding: 1rem; }
-    #event-info { font-size: 1.1rem; margin-bottom: 0.5rem; }
-    #countdown { font-size: 2rem; font-weight: bold; }
+    #info   { font-size: 1.1rem; margin-bottom: .5rem; }
+    #cd     { font-size: 2rem; font-weight: bold; }
   </style>
 </head>
 <body>
 
-  <div id="event-info">Loading…</div>
-  <div id="countdown">—:—:—</div>
+  <div id="info">Loading…</div>
+  <div id="cd">—:—:—</div>
 
   <script>
-  (function(){
-    // 1) Define the event in EST (UTC–5)
-    const eventDate = new Date('2025-05-30T08:00:00-05:00');
+    console.log('🔧 Countdown script starting…');
+    const rawDate = '2025-05-30T08:00:00-05:00';
+    const eventDate = new Date(rawDate);
+    console.log('🔧 Parsed eventDate =', eventDate);
 
-    const infoEl = document.getElementById('event-info');
-    const cdEl   = document.getElementById('countdown');
+    if (isNaN(eventDate)) {
+      document.getElementById('info').textContent = '❌ Error: invalid date';
+      throw new Error('Invalid event date: ' + rawDate);
+    }
+
+    const infoEl = document.getElementById('info');
+    const cdEl   = document.getElementById('cd');
 
     function update() {
+      console.log('🔧 update() called');
       const now = new Date();
-
-      // Show the event start in the user's locale + time‑zone name
-      infoEl.textContent = 
-        'Event starts at: ' + 
+      infoEl.textContent = 'Event starts at: ' +
         eventDate.toLocaleString(undefined, {
-          dateStyle:   'long',
-          timeStyle:   'short',
-          timeZoneName:'short'
+          dateStyle: 'long',
+          timeStyle: 'short',
+          timeZoneName: 'short'
         });
-
-      // Countdown math
       let diff = eventDate - now;
       if (diff <= 0) {
         cdEl.textContent = '🚀 Event has started!';
         clearInterval(timer);
         return;
       }
-      const d = Math.floor(diff / 864e5);             // days
-      diff %= 864e5;
-      const h = Math.floor(diff / 36e5);              // hours
-      diff %= 36e5;
-      const m = Math.floor(diff / 6e4);               // minutes
-      const s = Math.floor(diff / 1000 % 60);         // seconds
-
+      const d = Math.floor(diff / 864e5); diff %= 864e5;
+      const h = Math.floor(diff / 36e5); diff %= 36e5;
+      const m = Math.floor(diff / 6e4);
+      const s = Math.floor((diff / 1000) % 60);
       cdEl.textContent = `${d}d ${h}h ${m}m ${s}s`;
     }
 
     update();
     const timer = setInterval(update, 1000);
-  })();
+    console.log('🔧 Countdown script setup complete.');
   </script>
 
 </body>
