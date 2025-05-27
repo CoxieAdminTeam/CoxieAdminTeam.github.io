@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <title>Event Countdown</title>
   <style>
+    /* make background transparent and all text white */
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      color: #fff;
+    }
+    /* layout & typography */
     body { font-family: sans-serif; text-align: center; padding: 1rem; }
     #info { font-size: 1.1rem; margin-bottom: .5rem; }
     #cd   { font-size: 2rem; font-weight: bold; }
@@ -14,6 +22,7 @@
   <div id="cd">—:—:—</div>
 
   <script>
+    // Event is May 30, 2025 at 8 AM Eastern Daylight Time (UTC–4)
     const eventDate = new Date('2025-05-30T08:00:00-04:00');
     const infoEl    = document.getElementById('info');
     const cdEl      = document.getElementById('cd');
@@ -21,7 +30,7 @@
     function update() {
       const now = new Date();
 
-      // <-- updated formatting here -->
+      // show local‑ized event start
       infoEl.textContent = 'DMM Allstars 2 starts at: ' +
         eventDate.toLocaleString(undefined, {
           year:         'numeric',
@@ -32,16 +41,18 @@
           timeZoneName: 'short'
         });
 
+      // countdown math
       let diff = eventDate - now;
       if (diff <= 0) {
-        cdEl.textContent = '🚀 Event has started!';
+        cdEl.textContent = '🚀 DMM Allstars has started!';
         clearInterval(timer);
         return;
       }
       const d = Math.floor(diff / 864e5); diff %= 864e5;
-      const h = Math.floor(diff / 36e5); diff %= 36e5;
+      const h = Math.floor(diff / 36e5);  diff %= 36e5;
       const m = Math.floor(diff / 6e4);
       const s = Math.floor((diff / 1000) % 60);
+
       cdEl.textContent = `${d}d ${h}h ${m}m ${s}s`;
     }
 
