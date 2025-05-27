@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Event Countdown</title>
+  <title>Event & Finale Countdowns</title>
   <style>
-    /* make background transparent and all text white */
+    /* transparent background + white text */
     html, body {
       margin: 0;
       padding: 0;
@@ -12,27 +12,48 @@
       color: #fff;
     }
     /* layout & typography */
-    body { font-family: sans-serif; text-align: center; padding: 1rem; }
-    #info { font-size: 1.1rem; margin-bottom: .5rem; }
-    #cd   { font-size: 2rem; font-weight: bold; }
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 1rem;
+    }
+    .info {
+      font-size: 1.1rem;
+      margin: 1rem 0 0.5rem;
+    }
+    .cd {
+      font-size: 2rem;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-  <div id="info">Loading…</div>
-  <div id="cd">—:—:—</div>
+
+  <!-- Main Event -->
+  <div class="info" id="info1">Loading…</div>
+  <div class="cd"   id="cd1">—:—:—</div>
+
+  <!-- Finale -->
+  <div class="info" id="info2">Loading…</div>
+  <div class="cd"   id="cd2">—:—:—</div>
 
   <script>
-    // Event is May 30, 2025 at 8 AM Eastern Daylight Time (UTC–4)
-    const eventDate = new Date('2025-05-30T08:00:00-04:00');
-    const infoEl    = document.getElementById('info');
-    const cdEl      = document.getElementById('cd');
+    // 1) Define your two dates (both in Eastern Daylight Time)
+    const eventDate1 = new Date('2025-05-30T08:00:00-04:00');
+    const eventDate2 = new Date('2025-06-08T13:00:00-04:00');
 
-    function update() {
+    // 2) Grab the DOM elements
+    const info1 = document.getElementById('info1'),
+          cd1   = document.getElementById('cd1'),
+          info2 = document.getElementById('info2'),
+          cd2   = document.getElementById('cd2');
+
+    function updateCountdowns() {
       const now = new Date();
 
-      // show local‑ized event start
-      infoEl.textContent = 'DMM Allstars 2 starts at: ' +
-        eventDate.toLocaleString(undefined, {
+      // — Main Event —
+      info1.textContent = 'DMM Allstars 2 starts at: ' +
+        eventDate1.toLocaleString(undefined, {
           year:         'numeric',
           month:        'long',
           day:          'numeric',
@@ -40,24 +61,43 @@
           minute:       'numeric',
           timeZoneName: 'short'
         });
-
-      // countdown math
-      let diff = eventDate - now;
-      if (diff <= 0) {
-        cdEl.textContent = '🚀 DMM Allstars has started!';
-        clearInterval(timer);
-        return;
+      let diff1 = eventDate1 - now;
+      if (diff1 <= 0) {
+        cd1.textContent = '🚀 DMM Allstars 2 has started!';
+      } else {
+        const d1 = Math.floor(diff1 / 864e5); diff1 %= 864e5;
+        const h1 = Math.floor(diff1 / 36e5);  diff1 %= 36e5;
+        const m1 = Math.floor(diff1 / 6e4);
+        const s1 = Math.floor((diff1 / 1000) % 60);
+        cd1.textContent = `${d1}d ${h1}h ${m1}m ${s1}s`;
       }
-      const d = Math.floor(diff / 864e5); diff %= 864e5;
-      const h = Math.floor(diff / 36e5);  diff %= 36e5;
-      const m = Math.floor(diff / 6e4);
-      const s = Math.floor((diff / 1000) % 60);
 
-      cdEl.textContent = `${d}d ${h}h ${m}m ${s}s`;
+      // — Finale —
+      info2.textContent = 'Finale starts at: ' +
+        eventDate2.toLocaleString(undefined, {
+          year:         'numeric',
+          month:        'long',
+          day:          'numeric',
+          hour:         'numeric',
+          minute:       'numeric',
+          timeZoneName: 'short'
+        });
+      let diff2 = eventDate2 - now;
+      if (diff2 <= 0) {
+        cd2.textContent = '🚀 Finale is happening now!';
+      } else {
+        const d2 = Math.floor(diff2 / 864e5); diff2 %= 864e5;
+        const h2 = Math.floor(diff2 / 36e5);  diff2 %= 36e5;
+        const m2 = Math.floor(diff2 / 6e4);
+        const s2 = Math.floor((diff2 / 1000) % 60);
+        cd2.textContent = `${d2}d ${h2}h ${m2}m ${s2}s`;
+      }
     }
 
-    update();
-    const timer = setInterval(update, 1000);
+    // initial call + repeat every second
+    updateCountdowns();
+    setInterval(updateCountdowns, 1000);
   </script>
+
 </body>
 </html>
