@@ -2,41 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Countdown Debug</title>
+  <title>Event Countdown</title>
   <style>
     body { font-family: sans-serif; text-align: center; padding: 1rem; }
-    #info   { font-size: 1.1rem; margin-bottom: .5rem; }
-    #cd     { font-size: 2rem; font-weight: bold; }
+    #info { font-size: 1.1rem; margin-bottom: .5rem; }
+    #cd   { font-size: 2rem; font-weight: bold; }
   </style>
 </head>
 <body>
-
   <div id="info">Loading…</div>
   <div id="cd">—:—:—</div>
 
   <script>
-    console.log('🔧 Countdown script starting…');
-    const rawDate = '2025-05-30T08:00:00-05:00';
-    const eventDate = new Date(rawDate);
-    console.log('🔧 Parsed eventDate =', eventDate);
-
-    if (isNaN(eventDate)) {
-      document.getElementById('info').textContent = '❌ Error: invalid date';
-      throw new Error('Invalid event date: ' + rawDate);
-    }
-
-    const infoEl = document.getElementById('info');
-    const cdEl   = document.getElementById('cd');
+    const eventDate = new Date('2025-05-30T08:00:00-05:00');
+    const infoEl    = document.getElementById('info');
+    const cdEl      = document.getElementById('cd');
 
     function update() {
-      console.log('🔧 update() called');
       const now = new Date();
+
+      // <-- updated formatting here -->
       infoEl.textContent = 'Event starts at: ' +
         eventDate.toLocaleString(undefined, {
-          dateStyle: 'long',
-          timeStyle: 'short',
+          year:         'numeric',
+          month:        'long',
+          day:          'numeric',
+          hour:         'numeric',
+          minute:       'numeric',
           timeZoneName: 'short'
         });
+
       let diff = eventDate - now;
       if (diff <= 0) {
         cdEl.textContent = '🚀 Event has started!';
@@ -52,8 +47,6 @@
 
     update();
     const timer = setInterval(update, 1000);
-    console.log('🔧 Countdown script setup complete.');
   </script>
-
 </body>
 </html>
