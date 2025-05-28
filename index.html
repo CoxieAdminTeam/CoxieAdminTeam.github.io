@@ -57,14 +57,14 @@
       const now = new Date();
 
       // — Main Event —
-      info1.textContent = 'Event starts at: ' +
+      info1.textContent = 'DMM Allstars 2 starts at: ' +
         eventDate1.toLocaleString(undefined, {
           year: 'numeric', month: 'long', day: 'numeric',
           hour: 'numeric', minute: 'numeric', timeZoneName: 'short'
         });
       let diff1 = eventDate1 - now;
       if (diff1 <= 0) {
-        cd1.textContent = '🚀 Event has started!';
+        cd1.textContent = '🚀 DMM Allstars 2 has started!';
       } else {
         const d1 = Math.floor(diff1 / 864e5); diff1 %= 864e5;
         const h1 = Math.floor(diff1 / 36e5);  diff1 %= 36e5;
@@ -97,7 +97,7 @@
 
       if (now >= start && now < end) {
         // breach is live
-        info3.textContent = 'The breach is live!';
+        info3.textContent = 'A breach is live!';
         cd3.textContent   = '';
       } else {
         // next breach is either today at 3 PM or tomorrow
