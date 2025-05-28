@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Event & Finale Countdowns</title>
+  <title>Event, Finale & Breach Countdowns</title>
   <style>
     /* transparent background + white text */
     html, body {
@@ -11,7 +11,6 @@
       background: transparent;
       color: #fff;
     }
-    /* layout & typography */
     body {
       font-family: sans-serif;
       text-align: center;
@@ -37,33 +36,35 @@
   <div class="info" id="info2">Loading…</div>
   <div class="cd"   id="cd2">—:—:—</div>
 
+  <!-- Daily Breach -->
+  <div class="info" id="info3">Loading…</div>
+  <div class="cd"   id="cd3">—:—:—</div>
+
   <script>
-    // 1) Define your two dates (both in Eastern Daylight Time)
+    // 1) Fixed dates (EDT/UTC‑4)
     const eventDate1 = new Date('2025-05-30T08:00:00-04:00');
     const eventDate2 = new Date('2025-06-08T13:00:00-04:00');
 
-    // 2) Grab the DOM elements
+    // 2) DOM elements
     const info1 = document.getElementById('info1'),
           cd1   = document.getElementById('cd1'),
           info2 = document.getElementById('info2'),
-          cd2   = document.getElementById('cd2');
+          cd2   = document.getElementById('cd2'),
+          info3 = document.getElementById('info3'),
+          cd3   = document.getElementById('cd3');
 
     function updateCountdowns() {
       const now = new Date();
 
       // — Main Event —
-      info1.textContent = 'DMM Allstars 2 starts at: ' +
+      info1.textContent = 'Event starts at: ' +
         eventDate1.toLocaleString(undefined, {
-          year:         'numeric',
-          month:        'long',
-          day:          'numeric',
-          hour:         'numeric',
-          minute:       'numeric',
-          timeZoneName: 'short'
+          year: 'numeric', month: 'long', day: 'numeric',
+          hour: 'numeric', minute: 'numeric', timeZoneName: 'short'
         });
       let diff1 = eventDate1 - now;
       if (diff1 <= 0) {
-        cd1.textContent = '🚀 DMM Allstars 2 has started!';
+        cd1.textContent = '🚀 Event has started!';
       } else {
         const d1 = Math.floor(diff1 / 864e5); diff1 %= 864e5;
         const h1 = Math.floor(diff1 / 36e5);  diff1 %= 36e5;
@@ -75,12 +76,8 @@
       // — Finale —
       info2.textContent = 'Finale starts at: ' +
         eventDate2.toLocaleString(undefined, {
-          year:         'numeric',
-          month:        'long',
-          day:          'numeric',
-          hour:         'numeric',
-          minute:       'numeric',
-          timeZoneName: 'short'
+          year: 'numeric', month: 'long', day: 'numeric',
+          hour: 'numeric', minute: 'numeric', timeZoneName: 'short'
         });
       let diff2 = eventDate2 - now;
       if (diff2 <= 0) {
@@ -92,12 +89,41 @@
         const s2 = Math.floor((diff2 / 1000) % 60);
         cd2.textContent = `${d2}d ${h2}h ${m2}m ${s2}s`;
       }
+
+      // — Daily Breach —
+      // compute today’s 3 PM and 3:30 PM local
+      const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 15, 0, 0);
+      const end   = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 15, 30, 0);
+
+      if (now >= start && now < end) {
+        // breach is live
+        info3.textContent = 'The breach is live!';
+        cd3.textContent   = '';
+      } else {
+        // next breach is either today at 3 PM or tomorrow
+        let nextStart;
+        if (now < start) {
+          nextStart = start;
+        } else {
+          nextStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 15, 0, 0);
+        }
+        info3.textContent = 'Next breach starts at: ' +
+          nextStart.toLocaleString(undefined, {
+            year: 'numeric', month: 'long', day: 'numeric',
+            hour: 'numeric', minute: 'numeric', timeZoneName: 'short'
+          });
+        let diff3 = nextStart - now;
+        const d3 = Math.floor(diff3 / 864e5); diff3 %= 864e5;
+        const h3 = Math.floor(diff3 / 36e5);  diff3 %= 36e5;
+        const m3 = Math.floor(diff3 / 6e4);
+        const s3 = Math.floor((diff3 / 1000) % 60);
+        cd3.textContent = `${d3}d ${h3}h ${m3}m ${s3}s`;
+      }
     }
 
-    // initial call + repeat every second
+    // initial call + 1s interval
     updateCountdowns();
     setInterval(updateCountdowns, 1000);
   </script>
-
 </body>
 </html>
