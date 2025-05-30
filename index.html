@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Event, Finale & Breach Countdowns</title>
+  <title>DMMA2, Finale & Breach Countdowns (UTC Breach)</title>
   <style>
     /* transparent background + white text */
     html, body {
@@ -36,7 +36,7 @@
   <div class="info" id="info2">Loading…</div>
   <div class="cd"   id="cd2">—:—:—</div>
 
-  <!-- Daily Breach -->
+  <!-- Daily Breach at 19:00 UTC -->
   <div class="info" id="info3">Loading…</div>
   <div class="cd"   id="cd3">—:—:—</div>
 
@@ -57,14 +57,14 @@
       const now = new Date();
 
       // — Main Event —
-      info1.textContent = 'DMM Allstars 2 starts at: ' +
+      info1.textContent = 'DMMA2 starts at: ' +
         eventDate1.toLocaleString(undefined, {
           year: 'numeric', month: 'long', day: 'numeric',
           hour: 'numeric', minute: 'numeric', timeZoneName: 'short'
         });
       let diff1 = eventDate1 - now;
       if (diff1 <= 0) {
-        cd1.textContent = '🚀 DMM Allstars 2 has started!';
+        cd1.textContent = '🚀 DMMA2 has started!';
       } else {
         const d1 = Math.floor(diff1 / 864e5); diff1 %= 864e5;
         const h1 = Math.floor(diff1 / 36e5);  diff1 %= 36e5;
@@ -90,29 +90,33 @@
         cd2.textContent = `${d2}d ${h2}h ${m2}m ${s2}s`;
       }
 
-      // — Daily Breach —
-      // compute today’s 3 PM and 3:30 PM local
-      const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 15, 0, 0);
-      const end   = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 15, 30, 0);
+      // — Daily Breach at 19:00 UTC —
+      // compute today's breach window in UTC
+      const year  = now.getUTCFullYear(),
+            month = now.getUTCMonth(),
+            date  = now.getUTCDate();
+      const startUtc = new Date(Date.UTC(year, month, date, 19, 0, 0));
+      const endUtc   = new Date(Date.UTC(year, month, date, 19,30, 0));
 
-      if (now >= start && now < end) {
+      if (now >= startUtc && now < endUtc) {
         // breach is live
-        info3.textContent = 'A breach is live!';
+        info3.textContent = 'The breach is live! (19:00–19:30 UTC)';
         cd3.textContent   = '';
       } else {
-        // next breach is either today at 3 PM or tomorrow
-        let nextStart;
-        if (now < start) {
-          nextStart = start;
+        // next breach is either today at 19:00 UTC or tomorrow
+        let nextStartUtc;
+        if (now < startUtc) {
+          nextStartUtc = startUtc;
         } else {
-          nextStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 15, 0, 0);
+          nextStartUtc = new Date(Date.UTC(year, month, date + 1, 19, 0, 0));
         }
         info3.textContent = 'Next breach starts at: ' +
-          nextStart.toLocaleString(undefined, {
+          nextStartUtc.toLocaleString(undefined, {
             year: 'numeric', month: 'long', day: 'numeric',
             hour: 'numeric', minute: 'numeric', timeZoneName: 'short'
-          });
-        let diff3 = nextStart - now;
+          }) +
+          ' (19:00 UTC)';
+        let diff3 = nextStartUtc - now;
         const d3 = Math.floor(diff3 / 864e5); diff3 %= 864e5;
         const h3 = Math.floor(diff3 / 36e5);  diff3 %= 36e5;
         const m3 = Math.floor(diff3 / 6e4);
