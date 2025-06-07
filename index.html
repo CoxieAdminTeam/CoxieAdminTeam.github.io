@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>DMMA2, Finale & Breach Countdowns (UTC Breach)</title>
+  <title>DMMA2 & Finale Countdowns (Breaches Concluded)</title>
   <style>
     /* transparent background + white text */
     html, body {
@@ -36,12 +36,11 @@
   <div class="info" id="info2">Loading…</div>
   <div class="cd"   id="cd2">—:—:—</div>
 
-  <!-- Daily Breach at 19:00 UTC -->
-  <div class="info" id="info3">Loading…</div>
-  <div class="cd"   id="cd3">—:—:—</div>
+  <!-- Breaches Concluded -->
+  <div class="info">All breaches have concluded</div>
 
   <script>
-    // 1) Fixed dates (EDT/UTC‑4)
+    // 1) Fixed dates (EDT/UTC-4)
     const eventDate1 = new Date('2025-05-30T08:00:00-04:00');
     const eventDate2 = new Date('2025-06-08T13:00:00-04:00');
 
@@ -49,9 +48,7 @@
     const info1 = document.getElementById('info1'),
           cd1   = document.getElementById('cd1'),
           info2 = document.getElementById('info2'),
-          cd2   = document.getElementById('cd2'),
-          info3 = document.getElementById('info3'),
-          cd3   = document.getElementById('cd3');
+          cd2   = document.getElementById('cd2');
 
     function updateCountdowns() {
       const now = new Date();
@@ -88,40 +85,6 @@
         const m2 = Math.floor(diff2 / 6e4);
         const s2 = Math.floor((diff2 / 1000) % 60);
         cd2.textContent = `${d2}d ${h2}h ${m2}m ${s2}s`;
-      }
-
-      // — Daily Breach at 19:00 UTC —
-      // compute today's breach window in UTC
-      const year  = now.getUTCFullYear(),
-            month = now.getUTCMonth(),
-            date  = now.getUTCDate();
-      const startUtc = new Date(Date.UTC(year, month, date, 19, 0, 0));
-      const endUtc   = new Date(Date.UTC(year, month, date, 19,30, 0));
-
-      if (now >= startUtc && now < endUtc) {
-        // breach is live
-        info3.textContent = 'The breach is live! (19:00–19:30 UTC)';
-        cd3.textContent   = '';
-      } else {
-        // next breach is either today at 19:00 UTC or tomorrow
-        let nextStartUtc;
-        if (now < startUtc) {
-          nextStartUtc = startUtc;
-        } else {
-          nextStartUtc = new Date(Date.UTC(year, month, date + 1, 19, 0, 0));
-        }
-        info3.textContent = 'Next breach starts at: ' +
-          nextStartUtc.toLocaleString(undefined, {
-            year: 'numeric', month: 'long', day: 'numeric',
-            hour: 'numeric', minute: 'numeric', timeZoneName: 'short'
-          }) +
-          ' (19:00 UTC)';
-        let diff3 = nextStartUtc - now;
-        const d3 = Math.floor(diff3 / 864e5); diff3 %= 864e5;
-        const h3 = Math.floor(diff3 / 36e5);  diff3 %= 36e5;
-        const m3 = Math.floor(diff3 / 6e4);
-        const s3 = Math.floor((diff3 / 1000) % 60);
-        cd3.textContent = `${d3}d ${h3}h ${m3}m ${s3}s`;
       }
     }
 
