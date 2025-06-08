@@ -40,9 +40,10 @@
   <div class="info">All breaches have concluded</div>
 
   <script>
-    // 1) Fixed dates (EDT/UTC-4)
+    // 1) Fixed dates
     const eventDate1 = new Date('2025-05-30T08:00:00-04:00');
-    const eventDate2 = new Date('2025-06-08T13:00:00-04:00');
+    // Finale is now at 16:00 UTC (Z)
+    const eventDate2 = new Date('2025-06-08T16:00:00Z');
 
     // 2) DOM elements
     const info1 = document.getElementById('info1'),
@@ -88,7 +89,7 @@
       }
     }
 
-    // initial call + 1s interval
+    // initial call + repeat every second
     updateCountdowns();
     setInterval(updateCountdowns, 1000);
   </script>
