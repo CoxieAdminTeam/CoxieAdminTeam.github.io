@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>DMMA2 & Finale Countdowns (Breaches Concluded)</title>
+  <title>DMM Allstars Season 2 Ended</title>
   <style>
     /* transparent background + white text */
     html, body {
@@ -17,81 +17,13 @@
       padding: 1rem;
     }
     .info {
-      font-size: 1.1rem;
-      margin: 1rem 0 0.5rem;
-    }
-    .cd {
-      font-size: 2rem;
+      font-size: 1.5rem;
       font-weight: bold;
     }
   </style>
 </head>
 <body>
-
-  <!-- Main Event -->
-  <div class="info" id="info1">Loading…</div>
-  <div class="cd"   id="cd1">—:—:—</div>
-
-  <!-- Finale -->
-  <div class="info" id="info2">Loading…</div>
-  <div class="cd"   id="cd2">—:—:—</div>
-
-  <!-- Breaches Concluded -->
-  <div class="info">All breaches have concluded</div>
-
-  <script>
-    // 1) Fixed dates
-    const eventDate1 = new Date('2025-05-30T08:00:00-04:00');
-    // Finale is now at 16:00 UTC (Z)
-    const eventDate2 = new Date('2025-06-08T16:00:00Z');
-
-    // 2) DOM elements
-    const info1 = document.getElementById('info1'),
-          cd1   = document.getElementById('cd1'),
-          info2 = document.getElementById('info2'),
-          cd2   = document.getElementById('cd2');
-
-    function updateCountdowns() {
-      const now = new Date();
-
-      // — Main Event —
-      info1.textContent = 'DMMA2 starts at: ' +
-        eventDate1.toLocaleString(undefined, {
-          year: 'numeric', month: 'long', day: 'numeric',
-          hour: 'numeric', minute: 'numeric', timeZoneName: 'short'
-        });
-      let diff1 = eventDate1 - now;
-      if (diff1 <= 0) {
-        cd1.textContent = '🚀 DMMA2 has started!';
-      } else {
-        const d1 = Math.floor(diff1 / 864e5); diff1 %= 864e5;
-        const h1 = Math.floor(diff1 / 36e5);  diff1 %= 36e5;
-        const m1 = Math.floor(diff1 / 6e4);
-        const s1 = Math.floor((diff1 / 1000) % 60);
-        cd1.textContent = `${d1}d ${h1}h ${m1}m ${s1}s`;
-      }
-
-      // — Finale —
-      info2.textContent = 'Finale starts at: ' +
-        eventDate2.toLocaleString(undefined, {
-          year: 'numeric', month: 'long', day: 'numeric',
-          hour: 'numeric', minute: 'numeric', timeZoneName: 'short'
-        });
-      let diff2 = eventDate2 - now;
-      if (diff2 <= 0) {
-        cd2.textContent = '🚀 Finale is happening now!';
-      } else {
-        const d2 = Math.floor(diff2 / 864e5); diff2 %= 864e5;
-        const h2 = Math.floor(diff2 / 36e5);  diff2 %= 36e5;
-        const m2 = Math.floor(diff2 / 6e4);
-        const s2 = Math.floor((diff2 / 1000) % 60);
-        cd2.textContent = `${d2}d ${h2}h ${m2}m ${s2}s`;
-      }
-    }
-
-    // initial call + repeat every second
-    updateCountdowns();
-    setInterval(updateCountdowns, 1000);
-  </script>
+  <div class="info">DMM Allstars Season 2 has ended</div>
 </body>
 </html>
+
