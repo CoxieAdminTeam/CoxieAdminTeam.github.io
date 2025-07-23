@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>DMM Allstars Season 2 Ended</title>
+  <title>Event Status</title>
   <style>
-    /* transparent background + white text */
     html, body {
       margin: 0;
       padding: 0;
@@ -23,7 +22,36 @@
   </style>
 </head>
 <body>
-  <div class="info">DMM Allstars Season 2 has ended</div>
+  <div class="info" id="eventStatus">Loading…</div>
+
+  <script>
+    // ==== CONFIGURE YOUR EVENT HERE ====
+    const eventName = "DMM Allstars";
+    const eventStart = new Date("2024-08-01T20:00:00Z"); // UTC
+    const eventEnd   = new Date("2024-08-01T22:00:00Z"); // UTC
+
+    const statusDiv = document.getElementById("eventStatus");
+
+    function updateStatus() {
+      const now = new Date();
+
+      if (now < eventStart) {
+        const diff = Math.floor((eventStart - now) / 1000);
+        const hours = Math.floor(diff / 3600);
+        const minutes = Math.floor((diff % 3600) / 60);
+        const seconds = diff % 60;
+
+        statusDiv.textContent = `${eventName} begins in ${hours}h ${minutes}m ${seconds}s`;
+      } else if (now >= eventStart && now <= eventEnd) {
+        statusDiv.textContent = `${eventName} is ongoing`;
+      } else {
+        statusDiv.textContent = `${eventName} has ended`;
+      }
+    }
+
+    // Update every second
+    updateStatus();
+    setInterval(updateStatus, 1000);
+  </script>
 </body>
 </html>
-
