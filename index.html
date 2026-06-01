@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>DMM Allstars Status</title>
+  <title>DMM Allstars Tracker</title>
   <style>
     html, body {
       margin: 0;
@@ -15,27 +15,63 @@
       text-align: center;
       padding: 1rem;
     }
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .section {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    .title {
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #aaa;
+      margin-bottom: 0.5rem;
+    }
     .info {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       font-weight: bold;
+    }
+    .highlight {
+      color: #ff4d4d;
     }
   </style>
 </head>
 <body>
-  <div class="info" id="eventStatus">Loading…</div>
+  <div class="container">
+    <!-- Main Event Phase Card -->
+    <div class="section">
+      <div class="title">Tournament Status</div>
+      <div class="info" id="eventStatus">Loading…</div>
+    </div>
+
+    <!-- Daily Breach Tracker Card -->
+    <div class="section">
+      <div class="title">Breach Tracker</div>
+      <div class="info" id="breachStatus">Loading…</div>
+    </div>
+  </div>
 
   <script>
-    // ==== CONFIGURE YOUR EVENTS HERE ====
+    // ==== CONFIGURATION ====
     const eventName = "DMM Allstars";
     const eventStart = new Date("2026-06-06T13:00:00Z"); // June 6th, 1:00 PM UTC
     const finaleStart = new Date("2026-06-20T17:00:00Z"); // June 20th, 5:00 PM UTC
-    const eventEnd = new Date("2026-06-21T03:00:00Z"); // Adjusted for full-day tournament run time
+    const eventEnd = new Date("2026-06-21T03:00:00Z");
 
     const statusDiv = document.getElementById("eventStatus");
+    const breachDiv = document.getElementById("breachStatus");
 
+    // Standard Countdown Formatter
     function formatCountdown(targetDate) {
       const now = new Date();
       const diff = Math.floor((targetDate - now) / 1000);
+
+      if (diff <= 0) return "0s";
 
       const days = Math.floor(diff / 86400);
       const hours = Math.floor((diff % 86400) / 3600);
@@ -51,26 +87,56 @@
       return parts.join(" ");
     }
 
-    function updateStatus() {
-      const now = new Date();
-
+    // Handles Main Tournament Phase Logic
+    function updateEventStatus(now) {
       if (now < eventStart) {
-        // Phase 1: Countdown to the tournament kick-off
         statusDiv.textContent = `${eventName} begins in ${formatCountdown(eventStart)}`;
       } else if (now >= eventStart && now < finaleStart) {
-        // Phase 2: Tournament season is live, counting down to the live arena finale
-        statusDiv.innerHTML = `${eventName} is live! <br> Finale starts at the Rosemont Theatre in ${formatCountdown(finaleStart)}`;
+        statusDiv.innerHTML = `${eventName} is live! <br><span style="font-size:1.2rem; color:#ddd;">Finale starts at Rosemont Theatre in ${formatCountdown(finaleStart)}</span>`;
       } else if (now >= finaleStart && now <= eventEnd) {
-        // Phase 3: The live stage finale is happening
         statusDiv.textContent = `${eventName} Grand Finale is ongoing at the Rosemont Theatre!`;
       } else {
-        // Phase 4: Event concluded
         statusDiv.textContent = `${eventName} has ended`;
       }
     }
 
-    updateStatus();
-    setInterval(updateStatus, 1000);
+    // Handles Daily Dynamic Breach Logic
+    function updateBreachStatus(now) {
+      // Breaches run daily at 20:00 BST, which is 19:00 UTC
+      const breachHourUTC = 19; 
+      const breachMinuteUTC = 0;
+      const breachDurationMs = 30 * 60 * 1000; // 30 minutes
+
+      // Set up today's breach window target
+      let breachStart = new Date(now);
+      breachStart.setUTCHours(breachHourUTC, breachMinuteUTC, 0, 0);
+      let breachEnd = new Date(breachStart.getTime() + breachDurationMs);
+
+      // If today's breach window has completely closed, calculate for tomorrow's spawn
+      if (now > breachEnd) {
+        breachStart.setUTCDate(breachStart.getUTCDate() + 1);
+        breachEnd = new Date(breachStart.getTime() + breachDurationMs);
+      }
+
+      if (now < breachStart) {
+        // Phase A: Counting down to the next daily breach spawn
+        breachDiv.innerHTML = `Next breach in <span class="highlight">${formatCountdown(breachStart)}</span>`;
+      } else if (now >= breachStart && now <= breachEnd) {
+        // Phase B: Breach is live in multi-combat, counting down its remaining active duration
+        const remainingTime = formatCountdown(breachEnd);
+        breachDiv.innerHTML = `<span class="highlight">Breach has started!</span><br><span style="font-size:1.2rem;">Closes in ${remainingTime}</span>`;
+      }
+    }
+
+    function tick() {
+      const now = new Date();
+      updateEventStatus(now);
+      updateBreachStatus(now);
+    }
+
+    // Initialize and loop every second
+    tick();
+    setInterval(tick, 1000);
   </script>
 </body>
 </html>
