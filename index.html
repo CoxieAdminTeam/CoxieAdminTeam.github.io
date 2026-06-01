@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Event Status</title>
+  <title>DMM Allstars Status</title>
   <style>
     html, body {
       margin: 0;
@@ -25,34 +25,46 @@
   <div class="info" id="eventStatus">Loading…</div>
 
   <script>
-    // ==== CONFIGURE YOUR EVENT HERE ====
-    const eventName = "Event Placeholder";
-    const eventStart = new Date("2025-08-08T20:00:00Z"); // UTC
-    const eventEnd   = new Date("2025-08-08T22:00:00Z"); // UTC
+    // ==== CONFIGURE YOUR EVENTS HERE ====
+    const eventName = "DMM Allstars";
+    const eventStart = new Date("2026-06-06T13:00:00Z"); // June 6th, 1:00 PM UTC
+    const finaleStart = new Date("2026-06-20T17:00:00Z"); // June 20th, 5:00 PM UTC
+    const eventEnd = new Date("2026-06-21T03:00:00Z"); // Adjusted for full-day tournament run time
 
     const statusDiv = document.getElementById("eventStatus");
+
+    function formatCountdown(targetDate) {
+      const now = new Date();
+      const diff = Math.floor((targetDate - now) / 1000);
+
+      const days = Math.floor(diff / 86400);
+      const hours = Math.floor((diff % 86400) / 3600);
+      const minutes = Math.floor((diff % 3600) / 60);
+      const seconds = diff % 60;
+
+      let parts = [];
+      if (days > 0) parts.push(`${days}d`);
+      if (hours > 0 || days > 0) parts.push(`${hours}h`);
+      if (minutes > 0 || hours > 0 || days > 0) parts.push(`${minutes}m`);
+      parts.push(`${seconds}s`);
+
+      return parts.join(" ");
+    }
 
     function updateStatus() {
       const now = new Date();
 
       if (now < eventStart) {
-        const diff = Math.floor((eventStart - now) / 1000);
-
-        const days = Math.floor(diff / 86400);
-        const hours = Math.floor((diff % 86400) / 3600);
-        const minutes = Math.floor((diff % 3600) / 60);
-        const seconds = diff % 60;
-
-        let parts = [];
-        if (days > 0) parts.push(`${days}d`);
-        if (hours > 0 || days > 0) parts.push(`${hours}h`);
-        if (minutes > 0 || hours > 0 || days > 0) parts.push(`${minutes}m`);
-        parts.push(`${seconds}s`);
-
-        statusDiv.textContent = `${eventName} begins in ${parts.join(" ")}`;
-      } else if (now >= eventStart && now <= eventEnd) {
-        statusDiv.textContent = `${eventName} is ongoing`;
+        // Phase 1: Countdown to the tournament kick-off
+        statusDiv.textContent = `${eventName} begins in ${formatCountdown(eventStart)}`;
+      } else if (now >= eventStart && now < finaleStart) {
+        // Phase 2: Tournament season is live, counting down to the live arena finale
+        statusDiv.innerHTML = `${eventName} is live! <br> Finale starts at the Rosemont Theatre in ${formatCountdown(finaleStart)}`;
+      } else if (now >= finaleStart && now <= eventEnd) {
+        // Phase 3: The live stage finale is happening
+        statusDiv.textContent = `${eventName} Grand Finale is ongoing at the Rosemont Theatre!`;
       } else {
+        // Phase 4: Event concluded
         statusDiv.textContent = `${eventName} has ended`;
       }
     }
