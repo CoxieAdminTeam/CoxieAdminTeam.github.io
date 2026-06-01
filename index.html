@@ -18,6 +18,218 @@
     .container {
       display: flex;
       flex-direction: column;
+      gap: 1.2rem;
+    }
+    .section {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    .title {
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #aaa;
+      margin-bottom: 0.5rem;
+    }
+    .info {
+      font-size: 1.6rem;
+      font-weight: bold;
+    }
+    .highlight {
+      color: #ff4d4d;
+    }
+    .alert {
+      color: #ffcc00;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Tournament Phase Card -->
+    <div class="section">
+      <div class="title">Tournament Status</div>
+      <div class="info" id="eventStatus">Loading…</div>
+    </div>
+
+    <!-- Daily Breach Tracker Card -->
+    <div class="section">
+      <div class="title">Breach Tracker</div>
+      <div class="info" id="breachStatus">Loading…</div>
+    </div>
+
+    <!-- Bi-Daily Missions Tracker Card -->
+    <div class="section">
+      <div class="title">Missions</div>
+      <div class="info" id="missionStatus">Loading…</div>
+    </div>
+  </div>
+
+  <script>
+    // ==== CONFIGURATION ====
+    const eventName = "DMM Allstars";
+    const eventStart = new Date("2026-06-06T13:00:00Z"); // June 6th, 1:00 PM UTC
+    const finaleStart = new Date("2026-06-20T17:00:00Z"); // June 20th, 5:00 PM UTC
+    const eventEnd = new Date("2026-06-21T03:00:00Z");
+
+    const statusDiv = document.getElementById("eventStatus");
+    const breachDiv = document.getElementById("breachStatus");
+    const missionDiv = document.getElementById("missionStatus");
+
+    // Standard Countdown Formatter
+    function formatCountdown(targetDate) {
+      const now = new Date();
+      const diff = Math.floor((targetDate - now) / 1000);
+
+      if (diff <= 0) return "0s";
+
+      const days = Math.floor(diff / 86400);
+      const hours = Math.floor((diff % 86400) / 3600);
+      const minutes = Math.floor((diff % 3600) / 60);
+      const seconds = diff % 60;
+
+      let parts = [];
+      if (days > 0) parts.push(`${days}d`);
+      if (hours > 0 || days > 0) parts.push(`${hours}h`);
+      if (minutes > 0 || hours > 0 || days > 0) parts.push(`${minutes}m`);
+      parts.push(`${seconds}s`);
+
+      return parts.join(" ");
+    }
+
+    // Handles Main Tournament Phase Logic
+    function updateEventStatus(now) {
+      if (now < eventStart) {
+        statusDiv.textContent = `${eventName} begins in ${formatCountdown(eventStart)}`;
+      } else if (now >= eventStart && now < finaleStart) {
+        statusDiv.innerHTML = `${eventName} is live! <br><span style="font-size:1.2rem; color:#ddd;">Finale starts at Rosemont Theatre in ${formatCountdown(finaleStart)}</span>`;
+      } else if (now >= finaleStart && now <= eventEnd) {
+        statusDiv.textContent = `${eventName} Grand Finale is ongoing at the Rosemont Theatre!`;
+      } else {
+        statusDiv.textContent = `${eventName} has ended`;
+      }
+    }
+
+    // Handles Daily Dynamic Breach Logic (20:00 BST -> 19:00 UTC)
+    function updateBreachStatus(now) {
+      const breachHourUTC = 19; 
+      const breachMinuteUTC = 0;
+      const breachDurationMs = 30 * 60 * 1000; 
+
+      let breachStart = new Date(now);
+      breachStart.setUTCHours(breachHourUTC, breachMinuteUTC, 0, 0);
+      let breachEnd = new Date(breachStart.getTime() + breachDurationMs);
+
+      if (now > breachEnd) {
+        breachStart.setUTCDate(breachStart.getUTCDate() + 1);
+        breachEnd = new Date(breachStart.getTime() + breachDurationMs);
+      }
+
+      if (now < breachStart) {
+        breachDiv.innerHTML = `Next breach in <span class="highlight">${formatCountdown(breachStart)}</span>`;
+      } else if (now >= breachStart && now <= breachEnd) {
+        const remainingTime = formatCountdown(breachEnd);
+        breachDiv.innerHTML = `<span class="highlight">Breach has started!</span><br><span style="font-size:1.2rem;">Closes in ${remainingTime}</span>`;
+      }
+    }
+
+    // Handles Twice-Daily Missions Logic (16:00 BST -> 15:00 UTC & 00:00 BST -> 23:00 UTC)
+    function updateMissionStatus(now) {
+      // Define the target hours in UTC
+      const missionHoursUTC = [15, 23];
+      const alertDurationMs = 30 * 60 * 1000; // Keep the "New Mission" status on screen for 30 mins
+      
+      let upcomingMissions = [];
+
+      missionHoursUTC.forEach(hour => {
+        let mStart = new Date(now);
+        mStart.setUTCHours(hour, 0, 0, 0);
+        let mEnd = new Date(mStart.getTime() + alertDurationMs);
+
+        // If this specific window passed completely today, check that hour for tomorrow
+        if (now > mEnd) {
+          mStart.setUTCDate(mStart.getUTCDate() + 1);
+          mEnd = new Date(mStart.getTime() + alertDurationMs);
+        }
+
+        upcomingMissions.push({ start: mStart, end: mEnd });
+      });
+
+      // Sort windows chronologically to find the absolute closest one next
+      upcomingMissions.sort((a, b) => a.start - b.start);
+      const activeMission = upcomingMissions[0];
+
+      // If current time falls inside the window before the timer rolls forward
+      if (now >= new Date(activeMission.start.getTime() - alertDurationMs) && now < activeMission.start) {
+        // This edge handles the live presentation block right as it triggers
+        const currentWindow = upcomingMissions.find(m => now >= new Date(m.start.getTime() - alertDurationMs) && now <= m.end);
+        if (currentWindow && now >= currentWindow.start) {
+          missionDiv.innerHTML = `<span class="alert">New Mission Posted!</span><br><span style="font-size:1.2rem;">Teams are on the clock.</span>`;
+          return;
+        }
+      }
+
+      // Check if we are currently inside the 30-minute post-alert window
+      // We look at the absolute closest upcoming mission's yesterday/previous equivalent if necessary
+      let liveWindow = null;
+      for (let hour of missionHoursUTC) {
+        let testStart = new Date(now);
+        testStart.setUTCHours(hour, 0, 0, 0);
+        // Test today
+        let testEnd = new Date(testStart.getTime() + alertDurationMs);
+        if (now >= testStart && now <= testEnd) {
+          liveWindow = { start: testStart, end: testEnd };
+          break;
+        }
+        // Test yesterday (handles midnight boundary shifts cleanly)
+        let testStartYesterday = new Date(testStart);
+        testStartYesterday.setUTCDate(testStartYesterday.getUTCDate() - 1);
+        let testEndYesterday = new Date(testStartYesterday.getTime() + alertDurationMs);
+        if (now >= testStartYesterday && now <= testEndYesterday) {
+          liveWindow = { start: testStartYesterday, end: testEndYesterday };
+          break;
+        }
+      }
+
+      if (liveWindow) {
+        missionDiv.innerHTML = `<span class="alert">New Mission Posted!</span><br><span style="font-size:1.2rem;">Check the standings.</span>`;
+      } else {
+        missionDiv.innerHTML = `Next mission in <span class="alert">${formatCountdown(activeMission.start)}</span>`;
+      }
+    }
+
+    function tick() {
+      const now = new Date();
+      updateEventStatus(now);
+      updateBreachStatus(now);
+      updateMissionStatus(now);
+    }
+
+    // Initialize and loop every second
+    tick();
+    setInterval(tick, 1000);
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DMM Allstars Tracker</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      color: #fff;
+    }
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 1rem;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
       gap: 1.5rem;
     }
     .section {
